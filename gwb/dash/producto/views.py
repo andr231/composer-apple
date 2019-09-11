@@ -1,21 +1,15 @@
-from django.shortcuts import render, HttpResponse
-from django.views.generic import TemplateView, ListView, UpdateView, DeleteView, DetailView
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
-
+#from django.shortcuts import render, HttpResponse
+from django.views.generic import TemplateView, ListView,DetailView,CreateView,UpdateView,DeleteView
 from django.contrib.auth import get_user_model
-
-from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy, reverse
-
-# Create your views here.
+from django.contrib.auth.views import LoginView,LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from producto.models import Producto, Comentario, ImagenesProducto,CarritoCompras
 from django.urls import reverse
 from django.db.models import Q, Max, Min
+from producto.models import Producto, Comentario, ImagenesProducto,CarritoCompras,User
 
-
-
+User = get_user_model()
 class Indice(TemplateView):
     template_name = 'producto/index.html'
 
@@ -68,85 +62,81 @@ class DetalleProducto(DetailView):
     template_name = 'producto/detalle.html'
     model = Producto
 
-#def DetalleProducto(request):
-	#return render(request, "producto/DetalleProducto.html")
-
 class ComentarioProducto(CreateView):
     template_name = 'producto/detalle.html'
     model = Comentario
     fields = ('comentario','usuario','producto',)
 
     def get_success_url(self):
-        return "producto/detalle_producto/{}/".format(self.object.producto.pk)
+        return "/detalle_producto/{}/".format(self.object.producto.pk)
 
-#def ComentarioProducto(request):
-#	return render(request, "producto/ComentarioProducto.html")
-
-#def Salir(request):
-#	return render(request, "producto/Salir.html")
 class Salir(LogoutView):
-    next_page = reverse_lazy('indice')
+    	next_page = reverse_lazy('indice')
+#vita para inicio de sesion 
+class Ingresar(LoginView):
+    	template_name = 'producto/login.html'
+        def get(self, request, **args, **kwargs):
+            if request.user.is_authenticated:
+                return HttpResponseRedirect(reverse('indice'))
+            else:
+                context = self.get_context_data(**kwargs)
+                return self.render_to_response(context)
+        def get_success_url(self):
+                return reverse('indice')
 
+###falta codigo en inicio de sesion
+#falta agregar el carrito en el html detalle
 
-#def Ingresar(request):
-#	return render(request, "producto/Ingresar.html")
-
-
-class CambiarPerfil(UpdateView):
-    fields = ('telefono','last_name','first_name','email',)
-    #success_url = '/'
+class CambiarPerfil(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = ('telefono','apellido','usuario','nombre','email',)
+    success_url = '/'
     template_name = 'producto/perfil.html'
 
     def get_object(self, queryset=None):
         return self.request.user
 
-
-
-class AniadirCarrito(CreateView):
+class AniadirCarrito(LoginRequiredMixin, CreateView):
     model = CarritoCompras
     fields = ('usuario','producto','precio',)
     success_url = reverse_lazy('indice')
-   # login_url = 'ingresar'
-
-class EliminarCarrito(DeleteView):
+    login_url = 'ingresar'
+#desbes de estar logiado pra poder utilizar el carrito
+class EliminarCarrito(LoginRequiredMixin,DeleteView):
     queryset = CarritoCompras.objects.filter(comprado=False)
     model = CarritoCompras
     success_url = reverse_lazy('indice')
-   # login_url = 'ingresar'
+    login_url = 'ingresar'
 
-
-class ListarCarrito(ListView):
+class ListarCarrito(LoginRequiredMixin,ListView):
     template_name = 'producto/carrito.html'
     model = CarritoCompras
     queryset = CarritoCompras.objects.filter(comprado=False,pendiente=False)
-   # login_url = 'ingresar'
+    login_url = 'ingresar'
 
     def get_context_data(self, **kwargs):
         context = super(ListarCarrito, self).get_context_data(**kwargs)
         context['tab'] = 'sincomprar'
         return context
 
-class ListarCarritoPendientes(ListView):
+class ListarCarritoPendientes(LoginRequiredMixin,ListView):
     template_name = 'producto/carrito.html'
     model = CarritoCompras
     queryset = CarritoCompras.objects.filter(comprado=False,pendiente=True)
-   # login_url = 'ingresar'
-#
+    login_url = 'ingresar'
+
     def get_context_data(self, **kwargs):
         context = super(ListarCarritoPendientes, self).get_context_data(**kwargs)
         context['tab'] = 'pendientes'
         return context
 
-class ListarCarritoFinalizadas(ListView):
+class ListarCarritoFinalizadas(LoginRequiredMixin,ListView):
     template_name = 'producto/carrito.html'
     model = CarritoCompras
     queryset = CarritoCompras.objects.filter(comprado=True,pendiente=False)
-   # login_url = 'ingresar'
-    
+    login_url = 'ingresar'
+
     def get_context_data(self, **kwargs):
         context = super(ListarCarritoFinalizadas, self).get_context_data(**kwargs)
         context['tab'] = 'finalizadas'
         return context
-
-
-

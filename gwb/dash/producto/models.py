@@ -1,5 +1,13 @@
 from django.db import models
 # Create your models here.
+
+class User(models.Model):
+    usuario = models.CharField(max_length=300)
+    nombre = models.CharField(max_length=300)
+    apellido = models.CharField(max_length=300)
+    telefono = models.CharField(max_length=13)
+    email = models.EmailField(max_length=300)
+
 class Producto(models.Model):
     nombre = models.CharField(max_length=300)
     descripcion = models.CharField(max_length=300)
@@ -36,7 +44,5 @@ class CarritoCompras(models.Model):
     comprado = models.BooleanField(default=False)
     pendiente = models.BooleanField(default=False)
     
-
-
     def __str__(self):
         return "{} {}".format(self.usuario, self.producto)

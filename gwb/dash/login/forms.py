@@ -8,15 +8,15 @@ class RegistroF(UserCreationForm):
     class Meta:
         model = User
         fields = [
-                    'username',
-                    'first_name',
-                    'last_name',
+                    'usuario',
+                    'nombre',
+                    'apellido',
                     'email',
                     ]
 
         labels = {
-                    'username':'Nombre de Usuario',
-                    'first_name':'Nombre',
-                    'last_name':'Apellidos',
+                    'usuario':'Nombre de Usuario',
+                    'nombre':'Nombre',
+                    'apellido':'Apellidos',
                     'email':'Correo electronico',
                     }

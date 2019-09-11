@@ -1,27 +1,25 @@
-{% extends "producto/base.html" %}
-
-{% block contenido %}
+{% extends "producto/base.html" %} {% block contenido %}
 <div class="container">
-    <center>    
+    <center>
         <h1>
-            <span class="new badge" data-badge-caption="">{{object.precio}} $</span>
-            {{object.nombre}}
+            <span class="new badge" data-badge-caption="">{{object.precio}} $</span> {{object.nombre}}
         </h1>
     </center>
 
     <div class="slider">
         <ul class="slides">
-            
-            {% for imagen in object.producto_imagenes.all  %}
+
+            {% for imagen in object.producto_imagenes.all %}
             <li>
-                <img src="/media/{{imagen.imagen}}"> <!-- random image -->
+                <img src="/media/{{imagen.imagen}}">
+                <!-- random image -->
                 <div class="caption center-align">
-                    <h5 class="light grey-text text-lighten-3" >{{imagen.descripcion}}</h5>
+                    <h5 class="light grey-text text-lighten-3">{{imagen.descripcion}}</h5>
                 </div>
             </li>
             {% endfor %}
         </ul>
-        </div>
+    </div>
 
     <br>
     <div class="col s8 z-depth-1">
@@ -32,16 +30,15 @@
     <br>
 
     <ul class="collection">
-        
+
         {% for comentario in object.producto_comentarios.all %}
-            <li class="collection-item">
-                <span class="title">mensaje</span>
-                <p>
-                    {{comentario.comentario}}
-                    <br>
-                    {{comentario.usuario}} -  {{comentario.fecha}}
-                </p>
-            </li>
+        <li class="collection-item">
+            <span class="title">mensaje</span>
+            <p>
+                {{comentario.comentario}}
+                <br> {{comentario.usuario}} - {{comentario.fecha}}
+            </p>
+        </li>
         {% endfor %}
     </ul>
     <br>
@@ -62,7 +59,7 @@
                 <label for="icon_prefix2">Comentario</label>
             </div>
             <div class="input-field col s2">
-                    <button class="waves-effect waves-light btn-large">
+                <button class="waves-effect waves-light btn-large">
                         Comentar
                     </button>
             </div>
@@ -72,17 +69,17 @@
 </div>
 
 <div class="fixed-action-btn" style="bottom: 90px;">
-    <form action="{% url 'aniadir_carrito' %}" method="post">
+    <form action="" method="post">
         {% csrf_token %}
         <input type="hidden" name="usuario" value="{{request.user.pk}}">
         <input type="hidden" name="producto" value="{{object.pk}}">
         <input type="hidden" name="precio" value="{{object.precio}}">
-        
+
         <button class="btn-floating btn-large red pulse">
             <i class="large material-icons">add_shopping_cart</i>
         </button>
     </form>
-    
+
     <ul>
     </ul>
 </div>
